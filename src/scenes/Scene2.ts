@@ -5,17 +5,20 @@ import {
   DrawingUtils,
 } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.10.0";
 
-let poseLandmarker: PoseLandmarker | null = null;
+let poseLandmarker = null;
 let webcamRunning = false;
 let score = 0;
 
-export async function initScene(video: HTMLVideoElement): Promise<() => void> {
+export async function initScene(video) {
+  // Configurar resolución reducida para dispositivos móviles
+  video.width = 320;
+  video.height = 240;
+
   const canvasElement = document.createElement("canvas");
-  canvasElement.width = video.videoWidth;
-  canvasElement.height = video.videoHeight;
+  canvasElement.width = video.width;
+  canvasElement.height = video.height;
   document.body.appendChild(canvasElement);
 
-  // Crear el contador
   const counterElement = document.createElement("div");
   counterElement.style.position = "absolute";
   counterElement.style.top = "10px";
@@ -28,7 +31,6 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   counterElement.innerText = `Balls Caught: ${score}`;
   document.body.appendChild(counterElement);
 
-  // Crear el botón de Restart
   const restartButton = document.createElement("button");
   restartButton.style.position = "absolute";
   restartButton.style.top = "50px";
@@ -43,7 +45,7 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   restartButton.innerText = "Restart";
   document.body.appendChild(restartButton);
 
-  const canvasCtx = canvasElement.getContext("2d")!;
+  const canvasCtx = canvasElement.getContext("2d");
   canvasCtx.translate(canvasElement.width, 0);
   canvasCtx.scale(-1, 1);
   const drawingUtils = new DrawingUtils(canvasCtx);
@@ -62,31 +64,16 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   });
 
   webcamRunning = true;
-  let balls = generateBalls(10);
+  let balls = generateBalls(5);
 
   function drawBalls() {
     balls.forEach((ball) => {
-      if (!ball.active && ball.animationFrame === null) return;
-
-      const gradient = canvasCtx.createRadialGradient(
-        ball.x,
-        ball.y,
-        ball.radius * 0.5,
-        ball.x,
-        ball.y,
-        ball.radius
-      );
-      gradient.addColorStop(0, "#FFFFFF");
-      gradient.addColorStop(0.5, ball.color);
-      gradient.addColorStop(1, ball.color);
+      if (!ball.active) return;
 
       canvasCtx.beginPath();
       canvasCtx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
-      canvasCtx.fillStyle = gradient;
+      canvasCtx.fillStyle = ball.color;
       canvasCtx.fill();
-      canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = "#FFFFFF";
-      canvasCtx.stroke();
       canvasCtx.closePath();
     });
   }
@@ -94,10 +81,6 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   function updateBalls() {
     balls.forEach((ball) => {
       if (!ball.active) return;
-
-      const currentSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-      ball.vx = (ball.vx / currentSpeed) * ball.speed;
-      ball.vy = (ball.vy / currentSpeed) * ball.speed;
 
       ball.x += ball.vx;
       ball.y += ball.vy;
@@ -117,38 +100,21 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
     });
   }
 
-  function triggerBallAnimation(ball: any) {
-    ball.active = false;
-    ball.animationFrame = 0;
-    score++;
-    counterElement.innerText = `Balls Caught: ${score}`;
-  }
-
-  function animateBalls() {
-    balls.forEach((ball) => {
-      if (ball.animationFrame === null) return;
-
-      ball.animationFrame += 1;
-      ball.radius += 1;
-
-      if (ball.animationFrame > 10) {
-        ball.animationFrame = null;
-        ball.visible = false;
-      }
-    });
-  }
-
-  function checkInteractions(landmarks: any[]) {
+  function checkInteractions(landmarks) {
     landmarks.forEach((landmark) => {
+      const lx = landmark.x * canvasElement.width;
+      const ly = landmark.y * canvasElement.height;
+
       balls.forEach((ball) => {
-        if (!ball.active || ball.animationFrame !== null) return;
+        if (!ball.active) return;
 
-        const dx = ball.x - landmark.x * canvasElement.width;
-        const dy = ball.y - landmark.y * canvasElement.height;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < ball.radius) {
-          triggerBallAnimation(ball);
+        if (
+          Math.abs(ball.x - lx) < ball.radius &&
+          Math.abs(ball.y - ly) < ball.radius
+        ) {
+          ball.active = false;
+          score++;
+          counterElement.innerText = `Balls Caught: ${score}`;
         }
       });
     });
@@ -157,37 +123,23 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   async function predictWebcam() {
     if (!poseLandmarker || !webcamRunning) return;
 
+    const now = performance.now();
+
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
 
     updateBalls();
     drawBalls();
-    animateBalls();
 
-    const result = await poseLandmarker.detectForVideo(
-      video,
-      performance.now()
-    );
-
+    const result = await poseLandmarker.detectForVideo(video, now);
     if (result?.landmarks?.length) {
       const keyLandmarks = result.landmarks[0];
-      drawingUtils.drawLandmarks(keyLandmarks);
-      drawingUtils.drawConnectors(
-        keyLandmarks,
-        PoseLandmarker.POSE_CONNECTIONS
-      );
-
       checkInteractions(keyLandmarks);
     }
 
-    if (
-      balls.some((ball) => ball.active || ball.animationFrame !== null) &&
-      webcamRunning
-    ) {
+    if (balls.some((ball) => ball.active) && webcamRunning) {
       requestAnimationFrame(predictWebcam);
-    } else if (
-      !balls.some((ball) => ball.active || ball.animationFrame !== null)
-    ) {
+    } else if (!balls.some((ball) => ball.active)) {
       alert(`Game Over! Total Balls Caught: ${score}`);
       webcamRunning = false;
     }
@@ -195,8 +147,8 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
 
   restartButton.addEventListener("click", () => {
     webcamRunning = false;
-    balls = generateBalls(10); 
-    score = 0; 
+    balls = generateBalls(5);
+    score = 0;
     counterElement.innerText = `Balls Caught: ${score}`;
     webcamRunning = true;
     predictWebcam();
@@ -214,20 +166,17 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   };
 }
 
-function generateBalls(count: number) {
+function generateBalls(count) {
   const balls = [];
   for (let i = 0; i < count; i++) {
     balls.push({
-      x: Math.random() * 640,
-      y: Math.random() * 480,
+      x: Math.random() * 320,
+      y: Math.random() * 240,
       radius: 15,
       color: "red",
-      vx: (Math.random() * 2 - 1) * 5,
-      vy: (Math.random() * 2 - 1) * 5,
-      speed: 3,
+      vx: (Math.random() * 2 - 1) * 2,
+      vy: (Math.random() * 2 - 1) * 2,
       active: true,
-      animationFrame: null,
-      visible: true,
     });
   }
   return balls;
