@@ -9,15 +9,13 @@ let poseLandmarker: PoseLandmarker | null = null;
 let webcamRunning = false;
 let score = 0;
 
-const balls = generateBalls(5); // Generar 5 pelotas
-
 export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   const canvasElement = document.createElement("canvas");
   canvasElement.width = video.videoWidth;
   canvasElement.height = video.videoHeight;
   document.body.appendChild(canvasElement);
 
-  // Crear el elemento de contador
+  // Crear el contador
   const counterElement = document.createElement("div");
   counterElement.style.position = "absolute";
   counterElement.style.top = "10px";
@@ -29,6 +27,21 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   counterElement.style.borderRadius = "5px";
   counterElement.innerText = `Balls Caught: ${score}`;
   document.body.appendChild(counterElement);
+
+  // Crear el botón de Restart
+  const restartButton = document.createElement("button");
+  restartButton.style.position = "absolute";
+  restartButton.style.top = "50px";
+  restartButton.style.left = "10px";
+  restartButton.style.fontSize = "16px";
+  restartButton.style.padding = "10px";
+  restartButton.style.backgroundColor = "blue";
+  restartButton.style.color = "white";
+  restartButton.style.border = "none";
+  restartButton.style.borderRadius = "5px";
+  restartButton.style.cursor = "pointer";
+  restartButton.innerText = "Restart";
+  document.body.appendChild(restartButton);
 
   const canvasCtx = canvasElement.getContext("2d")!;
   canvasCtx.translate(canvasElement.width, 0);
@@ -49,10 +62,11 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   });
 
   webcamRunning = true;
+  let balls = generateBalls(10);
 
   function drawBalls() {
     balls.forEach((ball) => {
-      if (!ball.active && ball.animationFrame === null) return; 
+      if (!ball.active && ball.animationFrame === null) return;
 
       const gradient = canvasCtx.createRadialGradient(
         ball.x,
@@ -88,19 +102,25 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      if (ball.x + ball.radius > canvasElement.width || ball.x - ball.radius < 0) {
+      if (
+        ball.x + ball.radius > canvasElement.width ||
+        ball.x - ball.radius < 0
+      ) {
         ball.vx = -ball.vx;
       }
-      if (ball.y + ball.radius > canvasElement.height || ball.y - ball.radius < 0) {
+      if (
+        ball.y + ball.radius > canvasElement.height ||
+        ball.y - ball.radius < 0
+      ) {
         ball.vy = -ball.vy;
       }
     });
   }
 
   function triggerBallAnimation(ball: any) {
-    ball.active = false; 
+    ball.active = false;
     ball.animationFrame = 0;
-    score++; 
+    score++;
     counterElement.innerText = `Balls Caught: ${score}`;
   }
 
@@ -121,14 +141,14 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
   function checkInteractions(landmarks: any[]) {
     landmarks.forEach((landmark) => {
       balls.forEach((ball) => {
-        if (!ball.active || ball.animationFrame !== null) return; 
+        if (!ball.active || ball.animationFrame !== null) return;
 
         const dx = ball.x - landmark.x * canvasElement.width;
         const dy = ball.y - landmark.y * canvasElement.height;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < ball.radius) {
-          triggerBallAnimation(ball); 
+          triggerBallAnimation(ball);
         }
       });
     });
@@ -144,7 +164,10 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
     drawBalls();
     animateBalls();
 
-    const result = await poseLandmarker.detectForVideo(video, performance.now());
+    const result = await poseLandmarker.detectForVideo(
+      video,
+      performance.now()
+    );
 
     if (result?.landmarks?.length) {
       const keyLandmarks = result.landmarks[0];
@@ -157,14 +180,27 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
       checkInteractions(keyLandmarks);
     }
 
-    // Verificar si quedan pelotas visibles
-    if (balls.some((ball) => ball.active || ball.animationFrame !== null) && webcamRunning) {
+    if (
+      balls.some((ball) => ball.active || ball.animationFrame !== null) &&
+      webcamRunning
+    ) {
       requestAnimationFrame(predictWebcam);
-    } else if (!balls.some((ball) => ball.active || ball.animationFrame !== null)) {
-      alert(`Game Over! All balls are removed! Total Caught: ${score}`);
+    } else if (
+      !balls.some((ball) => ball.active || ball.animationFrame !== null)
+    ) {
+      alert(`Game Over! Total Balls Caught: ${score}`);
       webcamRunning = false;
     }
   }
+
+  restartButton.addEventListener("click", () => {
+    webcamRunning = false;
+    balls = generateBalls(10); 
+    score = 0; 
+    counterElement.innerText = `Balls Caught: ${score}`;
+    webcamRunning = true;
+    predictWebcam();
+  });
 
   predictWebcam();
 
@@ -172,7 +208,8 @@ export async function initScene(video: HTMLVideoElement): Promise<() => void> {
     webcamRunning = false;
     canvasElement.remove();
     counterElement.remove();
-    poseLandmarker?.close(); 
+    restartButton.remove();
+    poseLandmarker?.close();
     poseLandmarker = null;
   };
 }
@@ -187,10 +224,10 @@ function generateBalls(count: number) {
       color: "red",
       vx: (Math.random() * 2 - 1) * 5,
       vy: (Math.random() * 2 - 1) * 5,
-      speed: 5,
-      active: true, 
+      speed: 3,
+      active: true,
       animationFrame: null,
-      visible: true, 
+      visible: true,
     });
   }
   return balls;
