@@ -169,7 +169,7 @@ function generateBalls(count) {
     balls.push({
       x: Math.random() * 320,
       y: Math.random() * 240,
-      radius: 8,
+      radius: 20,
       color: "red",
       vx: (Math.random() * 2 - 1) * 2,
       vy: (Math.random() * 2 - 1) * 2,

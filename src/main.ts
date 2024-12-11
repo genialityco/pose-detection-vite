@@ -8,14 +8,14 @@ async function main() {
   const video = await initCamera();
 
   const experience1Button = document.createElement("button");
-  experience1Button.innerText = "Start Experience 1";
+  experience1Button.innerText = "Golpea el elemento";
   experience1Button.style.position = "absolute";
   experience1Button.style.top = "10px";
   experience1Button.style.left = "10px";
   document.body.appendChild(experience1Button);
 
   const experience2Button = document.createElement("button");
-  experience2Button.innerText = "Start Experience 2";
+  experience2Button.innerText = "Captura los elementos";
   experience2Button.style.position = "absolute";
   experience2Button.style.top = "10px";
   experience2Button.style.left = "150px";
@@ -24,8 +24,8 @@ async function main() {
   async function switchScene(
     initScene: (video: HTMLVideoElement) => Promise<() => void>
   ) {
-    if (currentSceneCleanup) currentSceneCleanup(); // Limpia la escena actual
-    currentSceneCleanup = await initScene(video); // Cambia a la nueva escena
+    if (currentSceneCleanup) currentSceneCleanup();
+    currentSceneCleanup = await initScene(video); 
   }
 
   experience1Button.addEventListener("click", () => switchScene(initScene1));
