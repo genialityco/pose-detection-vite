@@ -1,7 +1,9 @@
 export async function initCamera(): Promise<HTMLVideoElement> {
   const video = document.createElement("video");
   video.autoplay = true;
-
+  video.playsInline = true; // Necesario para iOS
+  video.muted = true; // Asegurar reproducción automática en iOS
+  
   // Detectar dimensiones de la pantalla
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -41,10 +43,10 @@ export async function initCamera(): Promise<HTMLVideoElement> {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
 
-    // Esperar hasta que los metadatos del video estén cargados
+    // Asegurar reproducción automática después de cargar metadatos
     return new Promise((resolve) => {
       video.onloadedmetadata = () => {
-        video.play(); // Asegurar que el video comience a reproducirse
+        video.play(); // Asegura que el video comience
         resolve(video);
       };
     });
