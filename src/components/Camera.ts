@@ -33,7 +33,7 @@ export async function initCamera(): Promise<HTMLVideoElement> {
     // Configuración para capturar la cámara
     const constraints = {
       video: {
-        facingMode: "environment", // Usar cámara trasera si está disponible
+        facingMode: "user", // Usar cámara trasera si está disponible
         width: { ideal: 1280 }, // Resolución ideal
         height: { ideal: 720 },
       },
