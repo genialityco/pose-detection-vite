@@ -64,7 +64,7 @@ export async function initScene(video) {
   });
 
   webcamRunning = true;
-  let balls = generateBalls(5);
+  let balls = generateBalls(20);
 
   function drawBalls() {
     balls.forEach((ball) => {
@@ -85,16 +85,10 @@ export async function initScene(video) {
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      if (
-        ball.x + ball.radius > canvasElement.width ||
-        ball.x - ball.radius < 0
-      ) {
+      if (ball.x + ball.radius > canvasElement.width || ball.x - ball.radius < 0) {
         ball.vx = -ball.vx;
       }
-      if (
-        ball.y + ball.radius > canvasElement.height ||
-        ball.y - ball.radius < 0
-      ) {
+      if (ball.y + ball.radius > canvasElement.height || ball.y - ball.radius < 0) {
         ball.vy = -ball.vy;
       }
     });
@@ -134,6 +128,12 @@ export async function initScene(video) {
     const result = await poseLandmarker.detectForVideo(video, now);
     if (result?.landmarks?.length) {
       const keyLandmarks = result.landmarks[0];
+      drawingUtils.drawLandmarks(keyLandmarks, { radius: 1, color: "white" });
+      drawingUtils.drawConnectors(
+        keyLandmarks,
+        PoseLandmarker.POSE_CONNECTIONS,
+        { color: "lime", lineWidth: 1 }
+      );
       checkInteractions(keyLandmarks);
     }
 
@@ -147,7 +147,7 @@ export async function initScene(video) {
 
   restartButton.addEventListener("click", () => {
     webcamRunning = false;
-    balls = generateBalls(5);
+    balls = generateBalls(20);
     score = 0;
     counterElement.innerText = `Balls Caught: ${score}`;
     webcamRunning = true;
@@ -172,7 +172,7 @@ function generateBalls(count) {
     balls.push({
       x: Math.random() * 320,
       y: Math.random() * 240,
-      radius: 15,
+      radius: 8,
       color: "red",
       vx: (Math.random() * 2 - 1) * 2,
       vy: (Math.random() * 2 - 1) * 2,
