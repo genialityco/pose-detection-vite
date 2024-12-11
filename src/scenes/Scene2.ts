@@ -11,9 +11,6 @@ let score = 0;
 
 export async function initScene(video) {
   // Configurar resolución reducida para dispositivos móviles
-  video.width = 320;
-  video.height = 240;
-
   const canvasElement = document.createElement("canvas");
   canvasElement.width = video.width;
   canvasElement.height = video.height;
