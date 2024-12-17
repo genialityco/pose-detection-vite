@@ -36,9 +36,9 @@ async function main() {
     currentSceneCleanup = await initScene(video);
   }
 
-  experience1Button.addEventListener("click", () => switchScene(initScene1));
+  // experience1Button.addEventListener("click", () => switchScene(initScene1));
   experience2Button.addEventListener("click", () => switchScene(initScene2));
-  experience3Button.addEventListener("click", () => switchScene(initScene3));
+  // experience3Button.addEventListener("click", () => switchScene(initScene3));
 }
 
 main().catch(console.error);
