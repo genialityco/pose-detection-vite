@@ -8,12 +8,12 @@ let currentSceneCleanup: (() => void) | null = null;
 async function main() {
   const video = await initCamera();
 
-  const experience1Button = document.createElement("button");
-  experience1Button.innerText = "Golpea el elemento";
-  experience1Button.style.position = "absolute";
-  experience1Button.style.top = "10px";
-  experience1Button.style.left = "10px";
-  document.body.appendChild(experience1Button);
+  // const experience1Button = document.createElement("button");
+  // experience1Button.innerText = "Golpea el elemento";
+  // experience1Button.style.position = "absolute";
+  // experience1Button.style.top = "10px";
+  // experience1Button.style.left = "10px";
+  // document.body.appendChild(experience1Button);
 
   const experience2Button = document.createElement("button");
   experience2Button.innerText = "Captura los elementos";
@@ -22,12 +22,12 @@ async function main() {
   experience2Button.style.left = "150px";
   document.body.appendChild(experience2Button);
 
-  const experience3Button = document.createElement("button");
-  experience3Button.innerText = "Captura con una extremidad";
-  experience3Button.style.position = "absolute";
-  experience3Button.style.top = "10px";
-  experience3Button.style.left = "300px";
-  document.body.appendChild(experience3Button);
+  // const experience3Button = document.createElement("button");
+  // experience3Button.innerText = "Captura con una extremidad";
+  // experience3Button.style.position = "absolute";
+  // experience3Button.style.top = "10px";
+  // experience3Button.style.left = "300px";
+  // document.body.appendChild(experience3Button);
 
   async function switchScene(
     initScene: (video: HTMLVideoElement) => Promise<() => void>
