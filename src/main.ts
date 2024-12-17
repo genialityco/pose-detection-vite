@@ -1,7 +1,7 @@
 import { initCamera } from "./components/Camera";
-import { initScene as initScene1 } from "./scenes/Scene1";
+// import { initScene as initScene1 } from "./scenes/Scene1";
 import { initScene as initScene2 } from "./scenes/Scene2";
-import { initScene as initScene3 } from "./scenes/Scene3";
+// import { initScene as initScene3 } from "./scenes/Scene3";
 
 let currentSceneCleanup: (() => void) | null = null;
 
