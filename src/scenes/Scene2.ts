@@ -195,10 +195,10 @@ export async function initScene(video) {
     gameOverContainer.style.top = "50%";
     gameOverContainer.style.left = "50%";
     gameOverContainer.style.transform = "translate(-50%, -50%)";
-    gameOverContainer.style.width = "500px"; 
-    gameOverContainer.style.height = "300px"; 
+    gameOverContainer.style.width = "485px"; 
+    gameOverContainer.style.height = "231px"; 
     gameOverContainer.style.backgroundImage = "url('/MARGO_GAME-OVER.png')"; 
-    gameOverContainer.style.backgroundSize = "contain";
+    gameOverContainer.style.backgroundSize = "cover";
     gameOverContainer.style.backgroundPosition = "center";
     gameOverContainer.style.textAlign = "center";
     gameOverContainer.style.display = "flex";
@@ -211,9 +211,9 @@ export async function initScene(video) {
     gameOverContainer.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.6)";
     gameOverContainer.style.zIndex = "1000";
 
-    // Título GAME OVER
+    // Finish game
     const title = document.createElement("div");
-    title.innerText = "GAME OVER";
+    title.innerText = "YOU WIN";
     title.style.fontSize = "2.5rem";
     title.style.marginBottom = "10px";
 
