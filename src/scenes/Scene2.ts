@@ -17,6 +17,8 @@ frameImage.src = "/MARCO-EXPERIENCIAS.png";
 
 const explosionSound = new Audio("/bass-drop-186085.mp3");
 
+let scoreAnimations = [];
+
 export async function initScene(video) {
   const loadingElement = document.createElement("div");
   loadingElement.innerText = "Cargando experiencia...";
@@ -163,6 +165,36 @@ export async function initScene(video) {
     });
   }
 
+  function drawScoreAnimations() {
+    scoreAnimations.forEach((anim, index) => {
+      const alpha = 1 - anim.progress;
+      const offset = anim.progress * 50; 
+      const scale = 1 + anim.progress * 0.5; 
+
+      canvasCtx.save(); 
+
+      // Mover el contexto al punto donde estará el texto
+      canvasCtx.translate(anim.x, anim.y - offset);
+
+      // Invertir horizontalmente el texto
+      canvasCtx.scale(-1, 1);
+
+      canvasCtx.fillStyle = `rgba(255, 255, 0, ${alpha})`;
+      canvasCtx.font = "30px Arial";
+      canvasCtx.textAlign = "center";
+
+      canvasCtx.fillText("+1", 0, 0);
+
+      canvasCtx.restore();
+
+      anim.progress += 0.05; 
+
+      if (anim.progress >= 1) {
+        scoreAnimations.splice(index, 1); 
+      }
+    });
+  }
+
   function checkInteractions(landmarks) {
     landmarks.forEach((landmark) => {
       const lx = landmark.x * canvasElement.width;
@@ -177,6 +209,14 @@ export async function initScene(video) {
         ) {
           ball.active = false;
           ball.exploding = true;
+
+          // Agregar animación de puntuación
+          scoreAnimations.push({
+            x: ball.x, // Coordenadas donde explotó la pelota
+            y: ball.y,
+            progress: 0, // Inicia en 0
+          });
+
           score++;
 
           explosionSound.currentTime = 0;
@@ -195,16 +235,16 @@ export async function initScene(video) {
     gameOverContainer.style.top = "50%";
     gameOverContainer.style.left = "50%";
     gameOverContainer.style.transform = "translate(-50%, -50%)";
-    gameOverContainer.style.width = "485px"; 
-    gameOverContainer.style.height = "231px"; 
-    gameOverContainer.style.backgroundImage = "url('/MARGO_GAME-OVER.png')"; 
+    gameOverContainer.style.width = "485px";
+    gameOverContainer.style.height = "231px";
+    gameOverContainer.style.backgroundImage = "url('/MARGO_GAME-OVER.png')";
     gameOverContainer.style.backgroundSize = "cover";
     gameOverContainer.style.backgroundPosition = "center";
     gameOverContainer.style.textAlign = "center";
     gameOverContainer.style.display = "flex";
     gameOverContainer.style.flexDirection = "column";
     gameOverContainer.style.justifyContent = "center";
-    gameOverContainer.style.color = "#004274"; 
+    gameOverContainer.style.color = "#004274";
     gameOverContainer.style.fontFamily = "Arial, sans-serif";
     gameOverContainer.style.fontWeight = "bold";
     gameOverContainer.style.borderRadius = "15px";
@@ -235,7 +275,7 @@ export async function initScene(video) {
     acceptButton.style.cursor = "pointer";
     acceptButton.style.fontWeight = "bold";
     acceptButton.onclick = () => {
-      document.body.removeChild(gameOverContainer); // Quita el contenedor al hacer clic
+      document.body.removeChild(gameOverContainer);
     };
 
     // Agregar elementos al contenedor principal
@@ -257,6 +297,7 @@ export async function initScene(video) {
 
     updateBalls();
     drawBalls();
+    drawScoreAnimations();
 
     const result = await poseLandmarker.detectForVideo(video, now);
     if (result?.landmarks?.length) {
