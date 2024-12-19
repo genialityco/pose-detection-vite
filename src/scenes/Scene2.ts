@@ -168,10 +168,10 @@ export async function initScene(video) {
   function drawScoreAnimations() {
     scoreAnimations.forEach((anim, index) => {
       const alpha = 1 - anim.progress;
-      const offset = anim.progress * 50; 
-      const scale = 1 + anim.progress * 0.5; 
+      const offset = anim.progress * 50;
+      const scale = 1 + anim.progress * 0.5;
 
-      canvasCtx.save(); 
+      canvasCtx.save();
 
       // Mover el contexto al punto donde estará el texto
       canvasCtx.translate(anim.x, anim.y - offset);
@@ -187,16 +187,22 @@ export async function initScene(video) {
 
       canvasCtx.restore();
 
-      anim.progress += 0.05; 
+      anim.progress += 0.05;
 
       if (anim.progress >= 1) {
-        scoreAnimations.splice(index, 1); 
+        scoreAnimations.splice(index, 1);
       }
     });
   }
 
   function checkInteractions(landmarks) {
-    landmarks.forEach((landmark) => {
+    // Índices de los puntos relevantes para las manos
+    const handLandmarksIndices = [
+      11, 13, 15, 17, 19, 21, 12, 14, 16, 18, 20, 22,
+    ];
+
+    handLandmarksIndices.forEach((index) => {
+      const landmark = landmarks[index];
       const lx = landmark.x * canvasElement.width;
       const ly = landmark.y * canvasElement.height;
 

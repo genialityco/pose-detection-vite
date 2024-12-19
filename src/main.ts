@@ -8,32 +8,107 @@ let currentSceneCleanup: (() => void) | null = null;
 async function main() {
   const video = await initCamera();
 
+  // Crear un contenedor centrado
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.flexDirection = "column";
+  container.style.justifyContent = "center";
+  container.style.alignItems = "center";
+  container.style.height = "100vh";
+  container.style.textAlign = "center";
+  document.body.appendChild(container);
+
+  // Crear texto de instrucciones
+  const instructions = document.createElement("p");
+  instructions.innerText =
+    "En esta experiencia, debes capturar los elementos que aparecen en la pantalla. Pulsa el botón de abajo para comenzar.";
+  instructions.style.fontSize = "30px";
+  instructions.style.marginBottom = "20px";
+  instructions.style.marginInline ="10px"
+  container.appendChild(instructions);
+
+  // Crear el botón de experiencia 1 (comentado)
   // const experience1Button = document.createElement("button");
-  // experience1Button.innerText = "Golpea el elemento";
-  // experience1Button.style.position = "absolute";
-  // experience1Button.style.top = "10px";
-  // experience1Button.style.left = "10px";
-  // document.body.appendChild(experience1Button);
+  // experience1Button.innerText = "¡Inicia la experiencia de golpear el elemento!";
+  // experience1Button.style.padding = "15px 30px";
+  // experience1Button.style.fontSize = "20px";
+  // experience1Button.style.cursor = "pointer";
+  // experience1Button.style.borderRadius = "8px";
+  // experience1Button.style.border = "none";
+  // experience1Button.style.backgroundColor = "#28A745";
+  // experience1Button.style.color = "white";
+  // experience1Button.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+  // experience1Button.style.transition = "background-color 0.3s";
+  //
+  // experience1Button.addEventListener("mouseenter", () => {
+  //   experience1Button.style.backgroundColor = "#218838";
+  // });
+  //
+  // experience1Button.addEventListener("mouseleave", () => {
+  //   experience1Button.style.backgroundColor = "#28A745";
+  // });
+  // container.appendChild(experience1Button);
 
+  // Crear el botón de experiencia 2
   const experience2Button = document.createElement("button");
-  experience2Button.innerText = "Captura los elementos";
-  experience2Button.style.position = "absolute";
-  experience2Button.style.top = "10px";
-  experience2Button.style.left = "150px";
-  document.body.appendChild(experience2Button);
+  experience2Button.innerText = "¡Inicia la experiencia de captura!";
+  experience2Button.style.padding = "15px 30px";
+  experience2Button.style.fontSize = "20px";
+  experience2Button.style.cursor = "pointer";
+  experience2Button.style.borderRadius = "8px";
+  experience2Button.style.border = "none";
+  experience2Button.style.backgroundColor = "#007BFF";
+  experience2Button.style.color = "white";
+  experience2Button.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+  experience2Button.style.transition = "background-color 0.3s";
 
+  experience2Button.addEventListener("mouseenter", () => {
+    experience2Button.style.backgroundColor = "#0056b3";
+  });
+
+  experience2Button.addEventListener("mouseleave", () => {
+    experience2Button.style.backgroundColor = "#007BFF";
+  });
+  container.appendChild(experience2Button);
+
+  // Crear el botón de experiencia 3 (comentado)
   // const experience3Button = document.createElement("button");
-  // experience3Button.innerText = "Captura con una extremidad";
-  // experience3Button.style.position = "absolute";
-  // experience3Button.style.top = "10px";
-  // experience3Button.style.left = "300px";
-  // document.body.appendChild(experience3Button);
+  // experience3Button.innerText = "¡Inicia la experiencia de capturar con una extremidad!";
+  // experience3Button.style.padding = "15px 30px";
+  // experience3Button.style.fontSize = "20px";
+  // experience3Button.style.cursor = "pointer";
+  // experience3Button.style.borderRadius = "8px";
+  // experience3Button.style.border = "none";
+  // experience3Button.style.backgroundColor = "#DC3545";
+  // experience3Button.style.color = "white";
+  // experience3Button.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+  // experience3Button.style.transition = "background-color 0.3s";
+  //
+  // experience3Button.addEventListener("mouseenter", () => {
+  //   experience3Button.style.backgroundColor = "#C82333";
+  // });
+  //
+  // experience3Button.addEventListener("mouseleave", () => {
+  //   experience3Button.style.backgroundColor = "#DC3545";
+  // });
+  // container.appendChild(experience3Button);
 
   async function switchScene(
     initScene: (video: HTMLVideoElement) => Promise<() => void>
   ) {
+    // Ocultar el contenedor principal
+    container.style.display = "none";
+
+    // Limpiar la escena actual si existe
     if (currentSceneCleanup) currentSceneCleanup();
+
+    // Iniciar la nueva escena
     currentSceneCleanup = await initScene(video);
+
+    // Mostrar el contenedor principal cuando termine la experiencia
+    currentSceneCleanup = () => {
+      container.style.display = "flex";
+    };
   }
 
   // experience1Button.addEventListener("click", () => switchScene(initScene1));
