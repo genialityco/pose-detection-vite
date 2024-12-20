@@ -13,11 +13,23 @@ const ballImage = new Image();
 ballImage.src = "/PELOTA.png";
 
 const frameImage = new Image();
-frameImage.src = "/MARCO-EXPERIENCIAS.png";
+const largeFrameSrc = "/MARCO-EXPERIENCIAS.png"; 
+const smallFrameSrc = "/MARCO-EXPERIENCIAS-MOVIL.png";
 
 const explosionSound = new Audio("/bass-drop-186085.mp3");
 
 let scoreAnimations = [];
+
+function updateFrameImage() {
+  if (window.innerWidth <= 768) {
+    frameImage.src = smallFrameSrc;
+  } else {
+    frameImage.src = largeFrameSrc;
+  }
+}
+
+updateFrameImage();
+window.addEventListener("resize", updateFrameImage);
 
 export async function initScene(video) {
   const loadingElement = document.createElement("div");
@@ -198,7 +210,7 @@ export async function initScene(video) {
   function checkInteractions(landmarks) {
     // Índices de los puntos relevantes para las manos
     const handLandmarksIndices = [
-      11, 13, 15, 17, 19, 21, 12, 14, 16, 18, 20, 22,
+      15, 17, 19, 21, 16, 18, 20, 22,
     ];
 
     handLandmarksIndices.forEach((index) => {
