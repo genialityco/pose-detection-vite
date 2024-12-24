@@ -18,13 +18,36 @@ async function main() {
   container.style.textAlign = "center";
   document.body.appendChild(container);
 
+  // Crear texto de bienvenida
+  const welcomeText = document.createElement("p");
+  welcomeText.innerText = "Welcome to You Interactive";
+  welcomeText.style.fontSize = "36px";
+  welcomeText.style.fontWeight = "bold";
+  welcomeText.style.marginBottom = "10px";
+  welcomeText.style.color = "#4A4A4A"; // Color opcional para mayor personalización
+  container.appendChild(welcomeText);
+
   // Crear texto de instrucciones
-  const instructions = document.createElement("p");
-  instructions.innerText =
-    "En esta experiencia, debes capturar los elementos que aparecen en la pantalla. Pulsa el botón de abajo para comenzar.";
+  const instructions = document.createElement("ul");
   instructions.style.fontSize = "30px";
   instructions.style.marginBottom = "20px";
-  instructions.style.marginInline ="10px"
+  instructions.style.marginInline = "10px";
+  instructions.style.listStyleType = "none";
+
+  // Agregar cada paso como un elemento de lista
+  const steps = [
+    "1. In You Interactive you must capture the elements that appear on the screen.",
+    "2. Use your hands and mouth to catch them.",
+    "3. Press the down arrow button to start.",
+  ];
+
+  steps.forEach((step) => {
+    const li = document.createElement("li");
+    li.innerText = step;
+    li.style.marginBottom = "10px";
+    instructions.appendChild(li);
+  });
+
   container.appendChild(instructions);
 
   // Crear el botón de experiencia 1 (comentado)
@@ -51,7 +74,7 @@ async function main() {
 
   // Crear el botón de experiencia 2
   const experience2Button = document.createElement("button");
-  experience2Button.innerText = "¡Inicia la experiencia de captura!";
+  experience2Button.innerText = "¡Start!";
   experience2Button.style.padding = "15px 30px";
   experience2Button.style.fontSize = "20px";
   experience2Button.style.cursor = "pointer";

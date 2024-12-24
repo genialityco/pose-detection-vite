@@ -33,7 +33,7 @@ window.addEventListener("resize", updateFrameImage);
 
 export async function initScene(video) {
   const loadingElement = document.createElement("div");
-  loadingElement.innerText = "Cargando experiencia...";
+  loadingElement.innerText = "Loading Your Experience...";
   loadingElement.style.position = "absolute";
   loadingElement.style.top = "50%";
   loadingElement.style.left = "50%";
@@ -271,7 +271,7 @@ export async function initScene(video) {
 
     // Finish game
     const title = document.createElement("div");
-    title.innerText = "YOU WIN";
+    title.innerText = "You won";
     title.style.fontSize = "2.5rem";
     title.style.marginBottom = "10px";
 
@@ -282,7 +282,7 @@ export async function initScene(video) {
 
     // Botón para cerrar el mensaje
     const acceptButton = document.createElement("button");
-    acceptButton.innerText = "Aceptar";
+    acceptButton.innerText = "Ok";
     acceptButton.style.marginTop = "15px";
     acceptButton.style.padding = "10px 20px";
     acceptButton.style.backgroundColor = "#004274";
