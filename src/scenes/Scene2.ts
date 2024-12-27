@@ -103,7 +103,7 @@ export async function initScene(video) {
   document.body.removeChild(loadingElement);
 
   webcamRunning = true;
-  let balls = generateBalls(5);
+  let balls = generateBalls(10, canvasElement);
 
   function drawFrame() {
     canvasCtx.save();
@@ -121,61 +121,86 @@ export async function initScene(video) {
   }
 
   function drawBalls() {
+    const padding = 50; // Espacio desde los bordes para respetar el marco
+  
     balls.forEach((ball) => {
       if (ball.exploding) {
         const progress = ball.explosionProgress;
-        canvasCtx.beginPath();
-        canvasCtx.arc(
-          ball.x,
-          ball.y,
-          ball.radius + progress * 20,
-          0,
-          2 * Math.PI
-        );
-        canvasCtx.strokeStyle = `rgba(255, 69, 0, ${1 - progress})`;
-        canvasCtx.lineWidth = 4;
-        canvasCtx.stroke();
-        canvasCtx.closePath();
-
+  
+        // Verificar si la explosión está dentro de los límites
+        if (
+          ball.x - ball.radius - progress * 20 >= padding &&
+          ball.x + ball.radius + progress * 20 <= canvasElement.width - padding &&
+          ball.y - ball.radius - progress * 20 >= padding &&
+          ball.y + ball.radius + progress * 20 <= canvasElement.height - padding
+        ) {
+          canvasCtx.beginPath();
+          canvasCtx.arc(
+            ball.x,
+            ball.y,
+            ball.radius + progress * 20,
+            0,
+            2 * Math.PI
+          );
+          canvasCtx.strokeStyle = `rgba(255, 69, 0, ${1 - progress})`;
+          canvasCtx.lineWidth = 4;
+          canvasCtx.stroke();
+          canvasCtx.closePath();
+        }
+  
         ball.explosionProgress += 0.05;
-
+  
         if (ball.explosionProgress >= 1) {
           ball.exploding = false;
         }
       } else if (ball.active) {
-        // Dibuja la pelota
-        canvasCtx.drawImage(
-          ballImage,
-          ball.x - ball.radius,
-          ball.y - ball.radius,
-          ball.radius * 2,
-          ball.radius * 2
-        );
+        // Verificar si la pelota está dentro de los límites antes de dibujarla
+        if (
+          ball.x - ball.radius >= padding &&
+          ball.x + ball.radius <= canvasElement.width - padding &&
+          ball.y - ball.radius >= padding &&
+          ball.y + ball.radius <= canvasElement.height - padding
+        ) {
+          canvasCtx.drawImage(
+            ballImage,
+            ball.x - ball.radius,
+            ball.y - ball.radius,
+            ball.radius * 2,
+            ball.radius * 2
+          );
+        }
       }
     });
   }
+  
 
   function updateBalls() {
+    const padding = 50; // Espacio en píxeles que las pelotas no pueden cruzar
+  
     balls.forEach((ball) => {
       if (!ball.active) return;
-
+  
       ball.x += ball.vx;
       ball.y += ball.vy;
-
+  
+      // Colisión con los bordes horizontales (izquierda y derecha)
       if (
-        ball.x + ball.radius > canvasElement.width ||
-        ball.x - ball.radius < 0
+        ball.x + ball.radius > canvasElement.width - padding ||
+        ball.x - ball.radius < padding
       ) {
         ball.vx = -ball.vx;
       }
+  
+      // Colisión con los bordes verticales (arriba y abajo)
       if (
-        ball.y + ball.radius > canvasElement.height ||
-        ball.y - ball.radius < 0
+        ball.y + ball.radius > canvasElement.height - padding ||
+        ball.y - ball.radius < padding
       ) {
         ball.vy = -ball.vy;
       }
     });
   }
+  
 
   function drawScoreAnimations() {
     scoreAnimations.forEach((anim, index) => {
@@ -341,7 +366,7 @@ export async function initScene(video) {
 
   restartImage.addEventListener("click", () => {
     webcamRunning = false;
-    balls = generateBalls(5);
+    balls = generateBalls(10, canvasElement);
     score = 0;
     counterElement.innerText = `Balls Caught: ${score}`;
     webcamRunning = true;
@@ -360,12 +385,14 @@ export async function initScene(video) {
   };
 }
 
-function generateBalls(count) {
+function generateBalls(count, canvasElement) {
   const balls = [];
+  const padding = 50; // Espacio para respetar el marco
+
   for (let i = 0; i < count; i++) {
     balls.push({
-      x: Math.random() * 320,
-      y: Math.random() * 240,
+      x: Math.random() * (canvasElement.width - 2 * padding) + padding, // Generar dentro del área visible
+      y: Math.random() * (canvasElement.height - 2 * padding) + padding,
       radius: 20,
       color: "red",
       vx: (Math.random() * 2 - 1) * 2,
@@ -377,3 +404,4 @@ function generateBalls(count) {
   }
   return balls;
 }
+

@@ -9,36 +9,73 @@ async function main() {
   const video = await initCamera();
 
   // Crear un contenedor centrado
-  const container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.flexDirection = "column";
-  container.style.justifyContent = "center";
-  container.style.alignItems = "center";
-  container.style.height = "100vh";
-  container.style.textAlign = "center";
-  document.body.appendChild(container);
+  const frameContainer = document.createElement("div");
+  frameContainer.style.position = "absolute";
+  frameContainer.style.top = "0";
+  frameContainer.style.left = "0";
+  frameContainer.style.width = "100%";
+  frameContainer.style.height = "100%";
+  frameContainer.style.zIndex = "1";
+  frameContainer.style.overflow = "hidden";
+
+  // Crear la imagen del marco
+  const frameElement = document.createElement("img");
+  frameElement.src = window.innerWidth <= 768 
+    ? "/MARCO-EXPERIENCIAS-MOVIL.png" 
+    : "/MARCO-EXPERIENCIAS.png";
+  frameElement.style.position = "absolute";
+  frameElement.style.top = "0";
+  frameElement.style.left = "0";
+  frameElement.style.width = "100%";
+  frameElement.style.height = "100%";
+  frameElement.style.objectFit = "contain"; 
+  frameContainer.appendChild(frameElement);
+
+  // Actualizar el marco al cambiar el tamaño de la ventana
+  window.addEventListener("resize", () => {
+    frameElement.src = window.innerWidth <= 768 
+      ? "/MARCO-EXPERIENCIAS-MOVIL.png" 
+      : "/MARCO-EXPERIENCIAS.png";
+  });
+
+  // Añadir el marco al cuerpo del documento
+  document.body.appendChild(frameContainer);
+
+  // Crear el contenedor principal para el contenido
+  const contentContainer = document.createElement("div");
+  contentContainer.style.position = "absolute";
+  contentContainer.style.top = "0";
+  contentContainer.style.left = "0";
+  contentContainer.style.width = "100%";
+  contentContainer.style.height = "100%";
+  contentContainer.style.display = "flex";
+  contentContainer.style.flexDirection = "column";
+  contentContainer.style.justifyContent = "center";
+  contentContainer.style.alignItems = "center";
+  contentContainer.style.zIndex = "2"; // Asegura que esté encima del marco
+  document.body.appendChild(contentContainer);
 
   // Crear texto de bienvenida
   const welcomeText = document.createElement("p");
-  welcomeText.innerText = "Welcome to You Interactive";
-  welcomeText.style.fontSize = "36px";
+  welcomeText.innerText = "Welcome to the interactive demo";
+  welcomeText.style.fontSize = "clamp(24px, 5vw, 36px)";
   welcomeText.style.fontWeight = "bold";
   welcomeText.style.marginBottom = "10px";
-  welcomeText.style.color = "#4A4A4A"; // Color opcional para mayor personalización
-  container.appendChild(welcomeText);
+  welcomeText.style.color = "#4A4A4A";
+  contentContainer.appendChild(welcomeText);
 
-  // Crear texto de instrucciones
   const instructions = document.createElement("ul");
-  instructions.style.fontSize = "30px";
+  instructions.style.fontSize = "clamp(18px, 4vw, 30px)";
   instructions.style.marginBottom = "20px";
-  instructions.style.marginInline = "10px";
+  instructions.style.padding = "0 20px";
   instructions.style.listStyleType = "none";
 
   // Agregar cada paso como un elemento de lista
   const steps = [
-    "1. In You Interactive you must capture the elements that appear on the screen.",
-    "2. Use your hands and mouth to catch them.",
-    "3. Press the down arrow button to start.",
+    "1. In this interactive demo you must capture the elements that appear on the screen.",
+    "2. Face your hands to the camera and It will start to detect your movements.",
+    "3. Use your opens hands to catch them.",
+    "4. Press the down arrow button to start.",
   ];
 
   steps.forEach((step) => {
@@ -48,7 +85,7 @@ async function main() {
     instructions.appendChild(li);
   });
 
-  container.appendChild(instructions);
+  contentContainer.appendChild(instructions);
 
   // Crear el botón de experiencia 1 (comentado)
   // const experience1Button = document.createElement("button");
@@ -74,9 +111,9 @@ async function main() {
 
   // Crear el botón de experiencia 2
   const experience2Button = document.createElement("button");
-  experience2Button.innerText = "¡Start!";
-  experience2Button.style.padding = "15px 30px";
-  experience2Button.style.fontSize = "20px";
+  experience2Button.innerText = "Start!";
+  experience2Button.style.padding = "10px 20px";
+  experience2Button.style.fontSize = "clamp(16px, 3vw, 20px)";
   experience2Button.style.cursor = "pointer";
   experience2Button.style.borderRadius = "8px";
   experience2Button.style.border = "none";
@@ -84,6 +121,8 @@ async function main() {
   experience2Button.style.color = "white";
   experience2Button.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
   experience2Button.style.transition = "background-color 0.3s";
+  experience2Button.style.minWidth = "150px";
+  experience2Button.style.maxWidth = "300px";
 
   experience2Button.addEventListener("mouseenter", () => {
     experience2Button.style.backgroundColor = "#0056b3";
@@ -92,7 +131,7 @@ async function main() {
   experience2Button.addEventListener("mouseleave", () => {
     experience2Button.style.backgroundColor = "#007BFF";
   });
-  container.appendChild(experience2Button);
+  contentContainer.appendChild(experience2Button);
 
   // Crear el botón de experiencia 3 (comentado)
   // const experience3Button = document.createElement("button");
@@ -120,7 +159,8 @@ async function main() {
     initScene: (video: HTMLVideoElement) => Promise<() => void>
   ) {
     // Ocultar el contenedor principal
-    container.style.display = "none";
+    frameContainer.style.display = "none";
+    contentContainer.style.display = "none";
 
     // Limpiar la escena actual si existe
     if (currentSceneCleanup) currentSceneCleanup();
@@ -130,7 +170,7 @@ async function main() {
 
     // Mostrar el contenedor principal cuando termine la experiencia
     currentSceneCleanup = () => {
-      container.style.display = "flex";
+      contentContainer.style.display = "flex";
     };
   }
 
